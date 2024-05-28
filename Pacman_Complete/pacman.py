@@ -4,6 +4,7 @@ from vector import Vector2
 from constants import *
 from entity import Entity
 from sprites import PacmanSprites
+import time
 
 class Pacman(Entity):
     def __init__(self, node):
@@ -14,6 +15,7 @@ class Pacman(Entity):
         self.setBetweenNodes(LEFT)
         self.alive = True
         self.sprites = PacmanSprites(self)
+        self.timer = 0
 
     def reset(self):
         Entity.reset(self)
@@ -27,9 +29,19 @@ class Pacman(Entity):
         self.alive = False
         self.direction = STOP
 
+
+
     def update(self, dt):	
         self.sprites.update(dt)
+
+        print("updating timer")
+        self.timer += 1
+        if self.timer >= 200:
+            super().updateSpeedFromBrainSignals()
+            self.timer = 0
+
         self.position += self.directions[self.direction]*self.speed*dt
+
         direction = self.getValidKey()
         if self.overshotTarget():
             self.node = self.target
@@ -64,8 +76,8 @@ class Pacman(Entity):
         for pellet in pelletList:
             if self.collideCheck(pellet):
                 return pellet
-        return None    
-    
+        return None
+
     def collideGhost(self, ghost):
         return self.collideCheck(ghost)
 

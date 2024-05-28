@@ -3,6 +3,9 @@ from pygame.locals import *
 from vector import Vector2
 from constants import *
 from random import randint
+import time
+
+from braindata import getSpeedFromBrainSignals
 
 
 class Entity(object):
@@ -11,7 +14,6 @@ class Entity(object):
         self.directions = {UP:Vector2(0, -1),DOWN:Vector2(0, 1), 
                           LEFT:Vector2(-1, 0), RIGHT:Vector2(1, 0), STOP:Vector2()}
         self.direction = STOP
-        
         #Before this, load braindata file somewhere (csv/real-time, how?)
         #if braindata == 0:
         #    print('Low Attention')
@@ -25,8 +27,9 @@ class Entity(object):
         #    a = 100
         #    self.setSpeed(100)
     
-        self.setSpeed(80) #adjusting this to a variable
-
+        # self.setSpeed(80) #adjusting this to a variable
+        # Set the initial speed based on brain signals
+        self.speed = 80
         self.radius = 10
         self.collideRadius = 5
         self.color = WHITE
@@ -36,9 +39,25 @@ class Entity(object):
         self.directionMethod = self.randomDirection
         self.setStartNode(node)
         self.image = None
+        self.timer = 0
+
+    def updateSpeedFromBrainSignals(self):
+        brain_signal = getSpeedFromBrainSignals()
+
+        print("Speed changed to option:", brain_signal)
+
+        if brain_signal == 0:
+            self.setSpeed(30)
+        elif brain_signal == 1:
+            self.setSpeed(75)
+        elif brain_signal == 2:
+            self.setSpeed(120)
+
+        # time.sleep(3)
 
     def setPosition(self):
         self.position = self.node.position.copy()
+
 
     def update(self, dt):
         self.position += self.directions[self.direction]*self.speed*dt
