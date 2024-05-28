@@ -4,9 +4,9 @@ from vector import Vector2
 from constants import *
 from random import randint
 import time
+from singleton import Singleton
 
-from braindata import getSpeedFromBrainSignals
-
+# from braindata import getSpeedFromBrainSignals
 
 class Entity(object):
     def __init__(self, node):
@@ -42,15 +42,17 @@ class Entity(object):
         self.timer = 0
 
     def updateSpeedFromBrainSignals(self):
-        brain_signal = getSpeedFromBrainSignals()
+        # getSpeedFromBrainSignals()
+        # print("Speed changed to option:", brain_signal)
+        singleton = Singleton()
 
-        print("Speed changed to option:", brain_signal)
-
-        if brain_signal == 0:
+        if singleton.value < 50587133:
             self.setSpeed(30)
-        elif brain_signal == 1:
+
+        elif 50587133 < singleton.value < 90600492:
             self.setSpeed(75)
-        elif brain_signal == 2:
+
+        elif singleton.value >= 90600492:
             self.setSpeed(120)
 
         # time.sleep(3)

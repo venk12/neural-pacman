@@ -12,6 +12,22 @@ from sprites import LifeSprites
 from sprites import MazeSprites
 from mazedata import MazeData
 
+# import time
+# import pandas as pd
+
+from threading import Thread, Event
+
+from buffer import Buffer
+from lsl_manager import *
+
+import time
+import numpy as np
+# import pandas as pd
+from analyze import analyze_signal
+import config
+from singleton import Singleton
+
+
 class GameController(object):
     def __init__(self):
         pygame.init()
@@ -269,11 +285,53 @@ class GameController(object):
         pygame.display.update()
 
 
+theta_psd = 0
+
 if __name__ == "__main__":
     game = GameController()
-    game.startGame()
-    while True:
-        game.update()
+    signal_timer = 0
+
+    # Access the singleton instance
+    singleton = Singleton()
+
+    # Initialize the variables
+    info = {'start_time': time.time()}
+
+    mode = "train"
+    # mode = "predict"
+
+    epoch_duration = config.epoch_information['duration']
+    sampling_rate = config.device_details['sfreq']
+    channel_names = config.device_details['channels']
+    all_channels = config.device_details['total_channel_from_device']
+    device_id = config.device_details['id']
+
+    ls_markers = []
+    eeg_signals = np.zeros((len(channel_names), epoch_duration * sampling_rate))
+
+    buffer = Buffer(duration=epoch_duration, sampling_rate=sampling_rate, num_channels=all_channels)
+    stop_event = Event()
+
+    bool_s_stream_status = check_stream(device_id)
+
+    if bool_s_stream_status:
+        signal_thread = Thread(target=read_signal_stream, args=(device_id, buffer, stop_event))
+        signal_thread.start()
+        game.startGame()
+
+        while True:
+            game.update()
+            signal_timer += 1
+
+            if(signal_timer >= 100):
+                print("signal timer triggerred")
+                df_buffer = buffer.get_plottable_data(channel_names)
+                print(df_buffer)
+                if df_buffer[channel_names].to_numpy().any():
+                    singleton.value = analyze_signal('bandpower', df_buffer, channel_names)
+                    print("singleton value" , singleton.value)
+                signal_timer = 0
+
 
 
 

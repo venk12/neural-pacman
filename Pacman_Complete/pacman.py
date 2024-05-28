@@ -34,7 +34,7 @@ class Pacman(Entity):
     def update(self, dt):	
         self.sprites.update(dt)
 
-        print("updating timer")
+        # print("updating timer")
         self.timer += 1
         if self.timer >= 200:
             super().updateSpeedFromBrainSignals()
