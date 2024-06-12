@@ -5,4 +5,5 @@ class Singleton:
         if cls._instance is None:
             cls._instance = super(Singleton, cls).__new__(cls)
             cls._instance.value = None
+            cls._instance.baseline_value = None
         return cls._instance

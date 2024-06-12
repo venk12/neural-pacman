@@ -55,20 +55,20 @@ class GameController(object):
         self.background_norm.fill(BLACK)
         self.background_flash = pygame.surface.Surface(SCREENSIZE).convert()
         self.background_flash.fill(BLACK)
-        self.background_norm = self.mazesprites.constructBackground(self.background_norm, self.level%5)
+        self.background_norm = self.mazesprites.constructBackground(self.background_norm, self.level % 5)
         self.background_flash = self.mazesprites.constructBackground(self.background_flash, 5)
         self.flashBG = False
         self.background = self.background_norm
 
-    def startGame(self):      
+    def startGame(self):
         self.mazedata.loadMaze(self.level)
-        self.mazesprites = MazeSprites(self.mazedata.obj.name+".txt", self.mazedata.obj.name+"_rotation.txt")
+        self.mazesprites = MazeSprites(self.mazedata.obj.name + ".txt", self.mazedata.obj.name + "_rotation.txt")
         self.setBackground()
-        self.nodes = NodeGroup(self.mazedata.obj.name+".txt")
+        self.nodes = NodeGroup(self.mazedata.obj.name + ".txt")
         self.mazedata.obj.setPortalPairs(self.nodes)
         self.mazedata.obj.connectHomeNodes(self.nodes)
         self.pacman = Pacman(self.nodes.getNodeFromTiles(*self.mazedata.obj.pacmanStart))
-        self.pellets = PelletGroup(self.mazedata.obj.name+".txt")
+        self.pellets = PelletGroup(self.mazedata.obj.name + ".txt")
         self.ghosts = GhostGroup(self.nodes.getStartTempNode(), self.pacman)
 
         self.ghosts.pinky.setStartNode(self.nodes.getNodeFromTiles(*self.mazedata.obj.addOffset(2, 3)))
@@ -83,28 +83,28 @@ class GameController(object):
         self.ghosts.clyde.startNode.denyAccess(LEFT, self.ghosts.clyde)
         self.mazedata.obj.denyGhostsAccess(self.ghosts, self.nodes)
 
-    def startGame_old(self):      
-        self.mazedata.loadMaze(self.level)#######
+    def startGame_old(self):
+        self.mazedata.loadMaze(self.level)  #######
         self.mazesprites = MazeSprites("maze1.txt", "maze1_rotation.txt")
         self.setBackground()
         self.nodes = NodeGroup("maze1.txt")
-        self.nodes.setPortalPair((0,17), (27,17))
+        self.nodes.setPortalPair((0, 17), (27, 17))
         homekey = self.nodes.createHomeNodes(11.5, 14)
-        self.nodes.connectHomeNodes(homekey, (12,14), LEFT)
-        self.nodes.connectHomeNodes(homekey, (15,14), RIGHT)
+        self.nodes.connectHomeNodes(homekey, (12, 14), LEFT)
+        self.nodes.connectHomeNodes(homekey, (15, 14), RIGHT)
         self.pacman = Pacman(self.nodes.getNodeFromTiles(15, 26))
         self.pellets = PelletGroup("maze1.txt")
         self.ghosts = GhostGroup(self.nodes.getStartTempNode(), self.pacman)
-        self.ghosts.blinky.setStartNode(self.nodes.getNodeFromTiles(2+11.5, 0+14))
-        self.ghosts.pinky.setStartNode(self.nodes.getNodeFromTiles(2+11.5, 3+14))
-        self.ghosts.inky.setStartNode(self.nodes.getNodeFromTiles(0+11.5, 3+14))
-        self.ghosts.clyde.setStartNode(self.nodes.getNodeFromTiles(4+11.5, 3+14))
-        self.ghosts.setSpawnNode(self.nodes.getNodeFromTiles(2+11.5, 3+14))
+        self.ghosts.blinky.setStartNode(self.nodes.getNodeFromTiles(2 + 11.5, 0 + 14))
+        self.ghosts.pinky.setStartNode(self.nodes.getNodeFromTiles(2 + 11.5, 3 + 14))
+        self.ghosts.inky.setStartNode(self.nodes.getNodeFromTiles(0 + 11.5, 3 + 14))
+        self.ghosts.clyde.setStartNode(self.nodes.getNodeFromTiles(4 + 11.5, 3 + 14))
+        self.ghosts.setSpawnNode(self.nodes.getNodeFromTiles(2 + 11.5, 3 + 14))
 
         self.nodes.denyHomeAccess(self.pacman)
         self.nodes.denyHomeAccessList(self.ghosts)
-        self.nodes.denyAccessList(2+11.5, 3+14, LEFT, self.ghosts)
-        self.nodes.denyAccessList(2+11.5, 3+14, RIGHT, self.ghosts)
+        self.nodes.denyAccessList(2 + 11.5, 3 + 14, LEFT, self.ghosts)
+        self.nodes.denyAccessList(2 + 11.5, 3 + 14, RIGHT, self.ghosts)
         self.ghosts.inky.startNode.denyAccess(RIGHT, self.ghosts.inky)
         self.ghosts.clyde.startNode.denyAccess(LEFT, self.ghosts.clyde)
         self.nodes.denyAccessList(12, 14, UP, self.ghosts)
@@ -112,14 +112,12 @@ class GameController(object):
         self.nodes.denyAccessList(12, 26, UP, self.ghosts)
         self.nodes.denyAccessList(15, 26, UP, self.ghosts)
 
-        
-
     def update(self):
         dt = self.clock.tick(30) / 1000.0
         self.textgroup.update(dt)
         self.pellets.update(dt)
         if not self.pause.paused:
-            self.ghosts.update(dt)      
+            self.ghosts.update(dt)
             if self.fruit is not None:
                 self.fruit.update(dt)
             self.checkPelletEvents()
@@ -185,7 +183,7 @@ class GameController(object):
                 if ghost.mode.current is FREIGHT:
                     self.pacman.visible = False
                     ghost.visible = False
-                    self.updateScore(ghost.points)                  
+                    self.updateScore(ghost.points)
                     self.textgroup.addText(str(ghost.points), WHITE, ghost.position.x, ghost.position.y, 8, time=1)
                     self.ghosts.updatePoints()
                     self.pause.setPause(pauseTime=1, func=self.showEntities)
@@ -193,16 +191,16 @@ class GameController(object):
                     self.nodes.allowHomeAccess(ghost)
                 elif ghost.mode.current is not SPAWN:
                     if self.pacman.alive:
-                        self.lives -=  1
+                        self.lives -= 1
                         self.lifesprites.removeImage()
-                        self.pacman.die()               
+                        self.pacman.die()
                         self.ghosts.hide()
                         if self.lives <= 0:
                             self.textgroup.showText(GAMEOVERTXT)
                             self.pause.setPause(pauseTime=3, func=self.restartGame)
                         else:
                             self.pause.setPause(pauseTime=3, func=self.resetLevel)
-    
+
     def checkFruitEvents(self):
         if self.pellets.numEaten == 50 or self.pellets.numEaten == 140:
             if self.fruit is None:
@@ -211,7 +209,8 @@ class GameController(object):
         if self.fruit is not None:
             if self.pacman.collideCheck(self.fruit):
                 self.updateScore(self.fruit.points)
-                self.textgroup.addText(str(self.fruit.points), WHITE, self.fruit.position.x, self.fruit.position.y, 8, time=1)
+                self.textgroup.addText(str(self.fruit.points), WHITE, self.fruit.position.x, self.fruit.position.y, 8,
+                                       time=1)
                 fruitCaptured = False
                 for fruit in self.fruitCaptured:
                     if fruit.get_offset() == self.fruit.image.get_offset():
@@ -239,7 +238,7 @@ class GameController(object):
         self.textgroup.updateLevel(self.level)
 
     def restartGame(self):
-        self.lives = 8 #change
+        self.lives = 8  #change
         self.level = 0
         self.pause.paused = True
         self.fruit = None
@@ -278,7 +277,7 @@ class GameController(object):
             self.screen.blit(self.lifesprites.images[i], (x, y))
 
         for i in range(len(self.fruitCaptured)):
-            x = SCREENWIDTH - self.fruitCaptured[i].get_width() * (i+1)
+            x = SCREENWIDTH - self.fruitCaptured[i].get_width() * (i + 1)
             y = SCREENHEIGHT - self.fruitCaptured[i].get_height()
             self.screen.blit(self.fruitCaptured[i], (x, y))
 
@@ -298,6 +297,7 @@ if __name__ == "__main__":
     info = {'start_time': time.time()}
 
     mode = "train"
+    signal_type = "baseline"
     # mode = "predict"
 
     epoch_duration = config.epoch_information['duration']
@@ -319,19 +319,21 @@ if __name__ == "__main__":
         signal_thread.start()
         game.startGame()
 
+        print("Rest state...Please focus on the cursor!")
+        time.sleep(10)
+        df_buffer = buffer.get_plottable_data(channel_names)
+        singleton.baseline_value = analyze_signal('bandpower', df_buffer, channel_names, signal_type)
+        print("Baseline theta value : ", singleton.baseline_value)
+
         while True:
             game.update()
             signal_timer += 1
 
-            if(signal_timer >= 100):
+            if signal_timer >= 100:
                 print("signal timer triggerred")
                 df_buffer = buffer.get_plottable_data(channel_names)
                 print(df_buffer)
                 if df_buffer[channel_names].to_numpy().any():
-                    singleton.value = analyze_signal('bandpower', df_buffer, channel_names)
-                    print("singleton value" , singleton.value)
+                    singleton.value = analyze_signal('bandpower', df_buffer, channel_names, signal_type)
+                    print("singleton value", singleton.value)
                 signal_timer = 0
-
-
-
-

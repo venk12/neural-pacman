@@ -4,6 +4,7 @@ import pandas as pd
 import mne
 
 import matplotlib.pyplot as plt
+import config
 # from mne.time_frequency import psd_multitaper
 from datetime import datetime
 
@@ -16,7 +17,8 @@ channel_mapping = {0: 'Fz', 1: 'C3', 2: 'Cz', 3: 'C4', 4: 'Pz', 5: 'PO7', 6: 'Oz
 
 
 def create_power_table(spectrum, band_name, channel_names):
-    ls_spectrum = spectrum.get_data().reshape(4, 8)
+    # print(spectrum.get_data().shape)
+    ls_spectrum = spectrum.get_data().reshape(10, 8)
     df = pd.DataFrame(ls_spectrum, columns=[f'Channel_{i}' for i in range(1, 9)])
     df.columns = channel_names
     print(band_name, "\n")
@@ -24,49 +26,29 @@ def create_power_table(spectrum, band_name, channel_names):
     print("--------------------------------------------------------------------------")
 
 
-def analyze_signal(mode, df_buffer, channel_names):
+def analyze_signal(mode, df_buffer, channel_names, signal_type):
     if mode == "bandpower":
-        # Clear plot
-        plt.clf()
-        plt.close('all')
+        # plt.clf()
+        # plt.close('all')
 
         channel_data = df_buffer.iloc[:, :-1].values.T
         timestamps = pd.to_datetime(df_buffer['timestamp'])
 
         info = mne.create_info(
             ch_names=channel_names,
-            sfreq=125.0,  # Assuming the data is sampled at 1 Hz; adjust as necessary
+            sfreq=config.device_details['sfreq'],  # Assuming the data is sampled at 1 Hz; adjust as necessary
             ch_types=['eeg'] * 8
         )
 
-        # Create Raw object
-        raw = mne.io.RawArray(channel_data, info)
+        raw = mne.io.RawArray(channel_data, info,verbose=None)
         raw.set_montage('standard_1005')
+        theta_band = (4, 8)
+        # alpha_band = (8, 12)
 
-        # raw.compute_psd()
-
-        # Bandpass filter for theta and alpha bands
-        theta_band = (4, 7)
-        alpha_band = (8, 13)
-
-        # Epoching the data
-        epochs = mne.make_fixed_length_epochs(raw, duration=0.5, overlap=0.0, preload=True)
-
-        # Compute PSD for epochs
-        # psds, freqs = mne.time_frequency.psd_welch(epochs, fmin=2, fmax=30, n_fft=256)
+        epochs = mne.make_fixed_length_epochs(raw, duration=1, overlap=0.0, preload=True)
 
         theta_spectrum = epochs.compute_psd(method='multitaper', fmin=theta_band[0], fmax=theta_band[1], tmin=0, tmax=2)
-        # theta_spectrum.plot()
-
-        alpha_spectrum = epochs.compute_psd(method='multitaper', fmin=theta_band[0], fmax=theta_band[1], tmin=0, tmax=2)
-        # alpha_spectrum.plot()
-
-        # Define the electrode names you want to include in the table
-        # electrode_names = ['Fz', 'Pz', 'Cz']
-
-        # Create tables for theta and alpha bands
-        create_power_table(theta_spectrum, 'theta', channel_names)
-        create_power_table(alpha_spectrum, 'alpha', channel_names)
+        theta_spectrum.plot()
 
         return np.mean(theta_spectrum)
         # Workload - theta wave (Average power)

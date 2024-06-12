@@ -46,13 +46,26 @@ class Entity(object):
         # print("Speed changed to option:", brain_signal)
         singleton = Singleton()
 
-        if singleton.value < 50587133:
+        mid = singleton.baseline_value * 1e-6
+        low = mid-3
+        high = mid+3
+
+        actual_value = singleton.value * 1e-6
+
+        print("The singleton.value is :", mid)
+        print("Low bound set to: ", low)
+        print("High bound set to: ", high)
+
+        if actual_value < low:
+            print("low workload detected")
             self.setSpeed(30)
 
-        elif 50587133 < singleton.value < 90600492:
+        elif low < actual_value < high:
+            print("medium workload detected")
             self.setSpeed(75)
 
-        elif singleton.value >= 90600492:
+        elif actual_value >= high:
+            print("high workload detected")
             self.setSpeed(120)
 
         # time.sleep(3)

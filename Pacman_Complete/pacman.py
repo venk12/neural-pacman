@@ -6,10 +6,11 @@ from entity import Entity
 from sprites import PacmanSprites
 import time
 
+
 class Pacman(Entity):
     def __init__(self, node):
-        Entity.__init__(self, node )
-        self.name = PACMAN    
+        Entity.__init__(self, node)
+        self.name = PACMAN
         self.color = YELLOW
         self.direction = LEFT
         self.setBetweenNodes(LEFT)
@@ -29,18 +30,16 @@ class Pacman(Entity):
         self.alive = False
         self.direction = STOP
 
-
-
-    def update(self, dt):	
+    def update(self, dt):
         self.sprites.update(dt)
 
         # print("updating timer")
         self.timer += 1
-        if self.timer >= 200:
+        if self.timer >= 120:
             super().updateSpeedFromBrainSignals()
             self.timer = 0
 
-        self.position += self.directions[self.direction]*self.speed*dt
+        self.position += self.directions[self.direction] * self.speed * dt
 
         direction = self.getValidKey()
         if self.overshotTarget():
@@ -56,7 +55,7 @@ class Pacman(Entity):
             if self.target is self.node:
                 self.direction = STOP
             self.setPosition()
-        else: 
+        else:
             if self.oppositeDirection(direction):
                 self.reverseDirection()
 
@@ -70,7 +69,7 @@ class Pacman(Entity):
             return LEFT
         if key_pressed[K_RIGHT]:
             return RIGHT
-        return STOP  
+        return STOP
 
     def eatPellets(self, pelletList):
         for pellet in pelletList:
@@ -84,7 +83,7 @@ class Pacman(Entity):
     def collideCheck(self, other):
         d = self.position - other.position
         dSquared = d.magnitudeSquared()
-        rSquared = (self.collideRadius + other.collideRadius)**2
+        rSquared = (self.collideRadius + other.collideRadius) ** 2
         if dSquared <= rSquared:
             return True
         return False

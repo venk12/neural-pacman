@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from mne.datasets import sample
 from mne.io import read_raw_fif
 
-from mne_realtime import LSLClient, MockLSLStream
+from documents.backup.mne_realtime import LSLClient, MockLSLStream
 
 print(__doc__)
 
