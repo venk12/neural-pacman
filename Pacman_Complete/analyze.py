@@ -26,10 +26,10 @@ def create_power_table(spectrum, band_name, channel_names):
     print("--------------------------------------------------------------------------")
 
 
-def analyze_signal(mode, df_buffer, channel_names, signal_type):
+def analyze_signal(mode, df_buffer, channel_names, signal_type, ls_rel_channels, ls_rel_bands):
     if mode == "bandpower":
-        # plt.clf()
-        # plt.close('all')
+        plt.clf()
+        plt.close('all')
 
         channel_data = df_buffer.iloc[:, :-1].values.T
         timestamps = pd.to_datetime(df_buffer['timestamp'])
@@ -42,23 +42,32 @@ def analyze_signal(mode, df_buffer, channel_names, signal_type):
 
         raw = mne.io.RawArray(channel_data, info,verbose=None)
         raw.set_montage('standard_1005')
-        theta_band = (4, 8)
-        # alpha_band = (8, 12)
 
+        freq_bands = {
+            'theta': (4, 8),
+            'alpha': (8, 12),
+            'beta': (12.5, 30)
+        }
+
+        (fmin, fmax) = freq_bands['alpha']
         epochs = mne.make_fixed_length_epochs(raw, duration=1, overlap=0.0, preload=True)
+        bandpower_df = pd.DataFrame(columns=ls_rel_channels, index=ls_rel_bands)
 
-        theta_spectrum = epochs.compute_psd(method='multitaper', fmin=theta_band[0], fmax=theta_band[1], tmin=0, tmax=2)
-        theta_spectrum.plot()
+        # for band, (fmin, fmax) in freq_bands.items():
+        psd, freqs = epochs.compute_psd(method='multitaper', fmin=fmin, fmax=fmax, tmin=0, tmax=None).get_data(return_freqs=True)
+        # psd_mean = psd.mean(axis=2)  # Average over time
+        # bandpower_df.loc[band, :] = psd_mean.mean(axis=0)  # Average over epochs
+
+        print(bandpower_df)
+        return bandpower_df
+
+        # epochs = mne.make_fixed_length_epochs(raw, duration=1, overlap=0.0, preload=True)
+
+
+        # theta_spectrum = epochs.compute_psd(method='multitaper', fmin=theta_band[0], fmax=theta_band[1], tmin=0, tmax=2)
+        # theta_spectrum.plot()
 
         return np.mean(theta_spectrum)
-        # Workload - theta wave (Average power)
-        # >10000 send 0
-        # > 1000
-
-        # theta_spectrum, alpha_spectrum are of the shape (4,8,1) (epochs, electrodes, _)
-        # write a for loop on theta and derived a table with columns (Epoch_number, band = theta, Fz, Pz and Cz), the table should contain values from theta_spectrum
-
-        # -------------
 
 
 def classify_eyeblinks(mode, df_buffer, channel_names):

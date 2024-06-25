@@ -319,21 +319,29 @@ if __name__ == "__main__":
         signal_thread.start()
         game.startGame()
 
+        ls_rel_channels = ['Fz', 'Cz']
+        ls_rel_bands = ['theta', 'alpha', 'beta']
+
         print("Rest state...Please focus on the cursor!")
         time.sleep(10)
         df_buffer = buffer.get_plottable_data(channel_names)
-        singleton.baseline_value = analyze_signal('bandpower', df_buffer, channel_names, signal_type)
-        print("Baseline theta value : ", singleton.baseline_value)
+        singleton.psd = analyze_signal('bandpower',
+                                       df_buffer,
+                                       channel_names,
+                                       signal_type,
+                                       ls_rel_channels,
+                                       ls_rel_bands)
+        # print("Baseline theta value : ", singleton.baseline_value)
 
-        while True:
-            game.update()
-            signal_timer += 1
-
-            if signal_timer >= 100:
-                print("signal timer triggerred")
-                df_buffer = buffer.get_plottable_data(channel_names)
-                print(df_buffer)
-                if df_buffer[channel_names].to_numpy().any():
-                    singleton.value = analyze_signal('bandpower', df_buffer, channel_names, signal_type)
-                    print("singleton value", singleton.value)
-                signal_timer = 0
+        # while True:
+        #     game.update()
+        #     signal_timer += 1
+        #
+        #     if signal_timer >= 100:
+        #         print("signal timer triggerred")
+        #         df_buffer = buffer.get_plottable_data(channel_names)
+        #         print(df_buffer)
+        #         if df_buffer[channel_names].to_numpy().any():
+        #             singleton.value = analyze_signal('bandpower', df_buffer, channel_names, signal_type)
+        #             print("singleton value", singleton.value)
+        #         signal_timer = 0

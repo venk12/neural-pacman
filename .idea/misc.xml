@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="BCI_Sessions" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="BCI_Sessions (2)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="BCI_Sessions" project-jdk-type="Python SDK" />
 </project>

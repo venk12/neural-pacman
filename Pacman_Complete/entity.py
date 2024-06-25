@@ -59,14 +59,20 @@ class Entity(object):
         if actual_value < low:
             print("low workload detected")
             self.setSpeed(30)
+            pygame.mixer.music.load('lowAttentionMusic.mp3')
+            pygame.mixer.music.play(-1)
 
         elif low < actual_value < high:
             print("medium workload detected")
             self.setSpeed(75)
+            pygame.mixer.music.load('neutralAttentionMusic.mp3')
+            pygame.mixer.music.play(-1)
 
         elif actual_value >= high:
             print("high workload detected")
             self.setSpeed(120)
+            pygame.mixer.music.load('highAttentionMusic.mp3')
+            pygame.mixer.music.play(-1)
 
         # time.sleep(3)
 
